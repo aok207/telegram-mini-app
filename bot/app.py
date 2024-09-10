@@ -14,7 +14,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     kb = [
         [
             InlineKeyboardButton(
-                "Show Me Google", web_app=WebAppInfo("https://google.com")
+                "Launch App",
+                web_app=WebAppInfo("https://content-crawl.vercel.app/"),
             )
         ]
     ]
