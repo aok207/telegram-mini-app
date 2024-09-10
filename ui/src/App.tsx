@@ -12,6 +12,7 @@ const App = () => {
       <div className="w-3/4 mx-auto">
         <LinkForm />
         {JSON.stringify(user, null, 2)}
+        {JSON.stringify(webApp, null, 2)}
       </div>
     </div>
   );
