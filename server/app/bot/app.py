@@ -1,13 +1,12 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-
 import log
 import settings
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update, WebAppInfo
+from telegram.ext import ApplicationBuilder, CallbackContext, CommandHandler
 
 logger = log.setup_logger(__name__)
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: Update, context: CallbackContext):
     if not update.effective_chat or not update.message:
         return
 
@@ -26,11 +25,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def run():
-    logger.info(f"The bot is running at t.me/{settings.BOT_USERNAME}...")
+def run_bot():
     application = ApplicationBuilder().token(settings.BOT_TOKEN).build()
 
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
 
+    logger.info("Starting the bot polling...")
     application.run_polling()
