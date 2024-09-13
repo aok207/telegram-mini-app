@@ -1,10 +1,10 @@
 """ This file will classify whether the url is a blog list or a single blog """
 
+import json
 import re
 from typing import Literal, cast
 
 from bs4 import BeautifulSoup
-import json
 
 
 def load_words() -> set[str]:

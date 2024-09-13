@@ -1,17 +1,18 @@
-from collections.abc import Iterable
 import re
+from collections.abc import Iterable
 from typing import Final, Union, cast
+from urllib.parse import urljoin
 
 import log
 import requests
 from bs4 import BeautifulSoup, PageElement, Tag
 
-from urllib.parse import urljoin
-
 from .classify import classify_page
 
+# Set up the logger
 logger = log.setup_logger(__name__)
 
+# List of unwanted texts, typically common site elements that are not relevant for scraping
 unwanted_texts: Final[list[str]] = [
     # General website links
     "follow",
@@ -139,6 +140,16 @@ unwanted_texts: Final[list[str]] = [
 
 
 def get_html(url: str) -> Union[BeautifulSoup, None]:
+    """
+    Fetch the HTML content of the given URL and return a BeautifulSoup object.
+
+    Args:
+        url (str): The URL to fetch.
+
+    Returns:
+        Union[BeautifulSoup, None]: A BeautifulSoup object if successful, None otherwise.
+    """
+
     try:
         req = requests.get(url)
         req.raise_for_status()
@@ -148,6 +159,16 @@ def get_html(url: str) -> Union[BeautifulSoup, None]:
 
 
 def get_meta_data(soup: BeautifulSoup) -> dict[str, str]:
+    """
+    Extract metadata (title, description, author, published date, etc.) from the BeautifulSoup object.
+
+    Args:
+        soup (BeautifulSoup): The parsed HTML content.
+
+    Returns:
+        dict[str, str]: A dictionary containing metadata such as title, description, author, etc.
+    """
+
     title = (
         soup.title.string.replace("\n", "").strip()
         if soup.title and soup.title.string
@@ -194,6 +215,17 @@ def extract_contents_from_descendants(
     unwanted_parents: Union[list[str], None] = None,
     length: int = 0,
 ):
+    """
+    Extract relevant content from the HTML descendants while filtering unwanted elements.
+
+    Args:
+        url (str): The base URL used for resolving relative links.
+        descendants (Iterable[PageElement]): The HTML elements to extract content from.
+        contents (list[dict[str, str]]): The list to store extracted content (text, images, links).
+        unwanted_parents (Union[list[str], None]): List of parent tags to ignore (e.g., "header", "footer").
+        length (int): Tracks the number of extracted elements.
+
+    """
 
     for c in descendants:
         if unwanted_parents and c.find_parent(unwanted_parents):
@@ -203,6 +235,16 @@ def extract_contents_from_descendants(
 
         if isinstance(c, Tag) and c.name == "img":
             content["img"] = c.get("src")
+
+        """
+        To extract a text, it must not be
+            - the instanace of Tag because we'll get duplicate texts otherwise (trust me)
+            - in the unwanted list
+            - less than 3 characters
+            - inside a figure (the reason why we don't just put it in the unwanted_parents is because
+                                we won't get images)
+            - a link whose href contains a "#", because these are not actual links
+        """
 
         if (
             not isinstance(c, Tag)
@@ -224,6 +266,17 @@ def extract_contents_from_descendants(
 
 
 def scrape(url: str):
+    """
+    Main function to scrape a web page. It extracts metadata, page content,
+    and handles content extraction based on page structure.
+
+    Args:
+        url (str): The URL of the page to scrape.
+
+    Returns:
+        dict: A dictionary containing page type, metadata, and extracted contents.
+    """
+
     soup = get_html(url)
 
     if soup is None:
@@ -239,8 +292,10 @@ def scrape(url: str):
 
     contents: list[dict[str, str]] = []
 
+    # Extract contents from the main element if it exists
     if main_ele:
         main_ele = cast(Tag, main_ele)
+        # Focus contents in the article tags
         for article in main_ele.find_all("article"):
             extract_contents_from_descendants(
                 url,
@@ -250,6 +305,7 @@ def scrape(url: str):
                 length,
             )
 
+        # If no article tags found, extract contents from the main element
         if length == 0:
             extract_contents_from_descendants(
                 url,
@@ -259,6 +315,7 @@ def scrape(url: str):
                 length,
             )
 
+    # If no main element found, extract contents from the body element
     else:
         if soup.body:
             extract_contents_from_descendants(
