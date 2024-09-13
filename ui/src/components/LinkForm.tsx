@@ -13,6 +13,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { submitForm } from "@/api";
+import { Data } from "@/types";
+import React from "react";
 
 const formSchema = z.object({
   url: z
@@ -23,7 +27,11 @@ const formSchema = z.object({
     .url(),
 });
 
-const LinkForm = () => {
+const LinkForm = ({
+  setData,
+}: {
+  setData: React.Dispatch<React.SetStateAction<Data | null>>;
+}) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,10 +39,23 @@ const LinkForm = () => {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  // Mutations
+  const { mutate, isPending } = useMutation({
+    mutationFn: submitForm,
+    onSuccess: (data) => {
+      if (data?.data) {
+        setData(data.data);
+        form.reset();
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  // Form Submit handler
+  function onSubmit({ url }: z.infer<typeof formSchema>) {
+    mutate(url);
   }
 
   return (
@@ -54,8 +75,11 @@ const LinkForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit">Scrape</Button>
+        <Button type="submit" disabled={isPending}>
+          {isPending ? "Submitting..." : "Scrape"}
+        </Button>
       </form>
+      {isPending && <p>We are scraping the website. Please wait...</p>}
     </Form>
   );
 };

@@ -3,11 +3,16 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { TelegramProvider } from "./context/TelegramContext.tsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <TelegramProvider>
-      <App />
-    </TelegramProvider>
+    <QueryClientProvider client={queryClient}>
+      <TelegramProvider>
+        <App />
+      </TelegramProvider>
+    </QueryClientProvider>
   </StrictMode>
 );

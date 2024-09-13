@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ITelegramUser {
   id: number;
   first_name: string;
@@ -44,4 +45,31 @@ export interface IWebApp {
     isActive: boolean;
   };
   HapticFeedback: any;
+}
+
+interface MetaData {
+  title: string;
+  description: string;
+  author: string;
+  published_date: string;
+  og_img: string;
+  og_type: string;
+}
+
+interface Content {
+  tag?: string;
+  text?: string;
+  img?: string;
+  link?: string;
+}
+
+export interface Data {
+  page_type: string;
+  meta_data: MetaData;
+  contents: Content[];
+}
+
+export interface ApiResponse {
+  data?: Data;
+  error?: string;
 }
