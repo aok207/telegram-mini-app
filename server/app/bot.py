@@ -33,3 +33,7 @@ def run_bot():
 
     logger.info("Starting the bot polling...")
     application.run_polling()
+
+
+if __name__ == "__main__":
+    run_bot()

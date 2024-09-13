@@ -1,5 +1,4 @@
 import validators
-from bot import run_bot
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -28,7 +27,3 @@ async def submit_form(data: Data, response: Response):
         return {"error": "Please enter a valid url!"}
 
     return {"data": scrape(data.url)}
-
-
-if __name__ == "__main__":
-    run_bot()

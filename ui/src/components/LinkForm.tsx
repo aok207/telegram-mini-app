@@ -75,9 +75,12 @@ const LinkForm = ({
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isPending}>
-          {isPending ? "Submitting..." : "Scrape"}
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button type="submit" disabled={isPending}>
+            {isPending ? "Submitting..." : "Scrape"}
+          </Button>
+        </div>
       </form>
       {isPending && <p>We are scraping the website. Please wait...</p>}
     </Form>

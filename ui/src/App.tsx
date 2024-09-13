@@ -3,10 +3,16 @@ import LinkForm from "./components/LinkForm";
 // import useTelegram from "./hooks/useTelegram";
 import { Data } from "./types";
 import Content from "./components/Content";
+import { Button } from "./components/ui/button";
+import useDownload from "./hooks/useDownload";
 
 const App = () => {
   // const { user } = useTelegram();
   const [data, setData] = useState<Data | null>(null);
+  const { download } = useDownload({
+    data: [JSON.stringify(data, null, 2)],
+    fileName: data?.meta_data.title || "",
+  });
 
   return (
     <div className="font-inter w-full md:max-w-[600px] mx-auto h-full flex flex-col gap-14">
@@ -15,6 +21,12 @@ const App = () => {
       </h1>
       <div className="w-3/4 mx-auto flex flex-col gap-8">
         <LinkForm setData={setData} />
+        {data && (
+          <Button type="button" variant={"outline"} onClick={download}>
+            Download as json file
+          </Button>
+        )}
+
         {data && <Content data={data} />}
       </div>
     </div>
