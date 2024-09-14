@@ -13,7 +13,14 @@ createRoot(document.getElementById("root")!).render(
     <QueryClientProvider client={queryClient}>
       <TelegramProvider>
         <App />
-        <Toaster />
+        <Toaster
+          toastOptions={{
+            style: {
+              wordBreak: "break-all",
+              maxWidth: 350,
+            },
+          }}
+        />
       </TelegramProvider>
     </QueryClientProvider>
   </StrictMode>
