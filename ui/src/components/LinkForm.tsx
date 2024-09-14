@@ -17,6 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 import { submitForm } from "@/api";
 import { Data } from "@/types";
 import React from "react";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   url: z
@@ -40,7 +41,7 @@ const LinkForm = ({
   });
 
   // Mutations
-  const { mutate, isPending } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: submitForm,
     onSuccess: (data) => {
       if (data?.data) {
@@ -55,7 +56,21 @@ const LinkForm = ({
 
   // Form Submit handler
   function onSubmit({ url }: z.infer<typeof formSchema>) {
-    mutate(url);
+    const promise = mutateAsync(url);
+
+    toast.promise(
+      promise,
+      {
+        loading: "Scraping the website...",
+        success: () => `Successfully scraped ${url}`,
+        error: () => "Network error. Please try again later.",
+      },
+      {
+        style: {
+          maxWidth: "250px",
+        },
+      }
+    );
   }
 
   return (
@@ -82,7 +97,6 @@ const LinkForm = ({
           </Button>
         </div>
       </form>
-      {isPending && <p>We are scraping the website. Please wait...</p>}
     </Form>
   );
 };
