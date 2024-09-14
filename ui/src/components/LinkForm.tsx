@@ -67,7 +67,7 @@ const LinkForm = ({
       },
       {
         style: {
-          maxWidth: "250px",
+          minWidth: "250px",
         },
       }
     );

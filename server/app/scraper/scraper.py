@@ -234,7 +234,7 @@ def extract_contents_from_descendants(
         content = {}
 
         if isinstance(c, Tag) and c.name == "img":
-            content["img"] = c.get("src")
+            content["img"] = urljoin(url, cast(str, c.get("src")))
 
         """
         To extract a text, it must not be
