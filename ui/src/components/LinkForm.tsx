@@ -26,17 +26,21 @@ const formSchema = z.object({
       message: "Please enter a url.",
     })
     .url(),
+  depth: z.coerce.number().gt(0).lte(3),
 });
 
 const LinkForm = ({
   setData,
 }: {
-  setData: React.Dispatch<React.SetStateAction<Data | null>>;
+  setData: React.Dispatch<
+    React.SetStateAction<Data[] | null>
+  >;
 }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       url: "",
+      depth: 1,
     },
   });
 
@@ -55,14 +59,14 @@ const LinkForm = ({
   });
 
   // Form Submit handler
-  function onSubmit({ url }: z.infer<typeof formSchema>) {
-    const promise = mutateAsync(url);
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    const promise = mutateAsync(data);
 
     toast.promise(
       promise,
       {
         loading: "Scraping the website...",
-        success: () => `Successfully scraped ${url}`,
+        success: () => `Successfully scraped ${data.url}`,
         error: () => "Network error. Please try again later.",
       },
       {
@@ -86,6 +90,24 @@ const LinkForm = ({
                 <Input placeholder="https://example.com" {...field} />
               </FormControl>
               <FormDescription>Please enter a url to scrape.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="depth"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Depth</FormLabel>
+              <FormControl>
+                <Input type="number" {...field} />
+              </FormControl>
+              <FormDescription>
+                Please enter the depth for the crawler to look for in a link. (1
+                - 3)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

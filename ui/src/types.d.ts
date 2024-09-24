@@ -47,7 +47,7 @@ export interface IWebApp {
   HapticFeedback: any;
 }
 
-interface MetaData {
+export interface MetaData {
   title: string;
   description: string;
   author: string;
@@ -56,7 +56,7 @@ interface MetaData {
   og_type: string;
 }
 
-interface Content {
+export interface Content {
   tag?: string;
   text?: string;
   img?: string;
@@ -64,12 +64,14 @@ interface Content {
 }
 
 export interface Data {
-  page_type: string;
-  meta_data: MetaData;
-  contents: Content[];
+  [url: string]: {
+    page_type: string;
+    meta_data: MetaData;
+    contents: Content[];
+  };
 }
 
 export interface ApiResponse {
-  data?: Data;
+  data?: Data[];
   error?: string;
 }

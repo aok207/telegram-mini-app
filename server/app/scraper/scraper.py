@@ -1,7 +1,7 @@
 import re
 from collections.abc import Iterable
-from typing import Final, Union, cast
-from urllib.parse import urljoin
+from typing import Any, Final, Union, cast
+from urllib.parse import unquote, urljoin, urlparse
 
 import log
 import requests
@@ -265,22 +265,18 @@ def extract_contents_from_descendants(
             length += 1
 
 
-def scrape(url: str):
+def scrape(url: str, soup: BeautifulSoup):
     """
     Main function to scrape a web page. It extracts metadata, page content,
     and handles content extraction based on page structure.
 
     Args:
-        url (str): The URL of the page to scrape.
+        url (str): The url of the website
+        soup (BeautifulSoup): The BeautifulSoup object of the website.
 
     Returns:
         dict: A dictionary containing page type, metadata, and extracted contents.
     """
-
-    soup = get_html(url)
-
-    if soup is None:
-        return None
 
     page_type = classify_page(url, soup)
 
@@ -327,3 +323,62 @@ def scrape(url: str):
             )
 
     return {"page_type": page_type, "meta_data": meta_data, "contents": contents}
+
+
+def is_same_domain(start_url: str, target_url: str):
+    # Parse the start URL and target URL
+    start_domain = urlparse(start_url).netloc
+    target_domain = urlparse(target_url).netloc
+    # Compare domains to ensure they match
+    return start_domain == target_domain
+
+
+def is_valid_url(url: str):
+    parsed = urlparse(url)
+    return bool(parsed.scheme) and bool(parsed.netloc)
+
+
+def get_all_links(soup: BeautifulSoup, main_url: str):
+    """
+    Extract all links from the given BeautifulSoup object.
+    """
+    links: set[str] = set()
+    for link in soup.find_all("a", href=True):
+        href = link.get("href")
+        full_url = urljoin(main_url, href)
+
+        if is_valid_url(full_url) and is_same_domain(main_url, full_url):
+            links.add(full_url)
+
+    return links
+
+
+def crawl(
+    url: str, original_url: str, visited: set[str], contents: list[dict], depth: int = 1
+):
+    soup = get_html(url)
+
+    if soup is None:
+        return None
+
+    decoded_url = unquote(url)
+    visited.add(url)
+    logger.info(f"Crawling {decoded_url}")
+
+    if depth == 1:
+        contents.append({decoded_url: scrape(url, soup)})
+        return
+
+    contents.append({url: scrape(url, soup)})
+    links = get_all_links(soup, original_url)
+
+    for link in links:
+        if link not in visited:
+            crawl(link, original_url, visited, contents, depth - 1)
+
+
+def crawl_website(url: str, depth: int = 1):
+    visited: set[str] = set()
+    contents: list[dict[str, dict[str, Any]]] = []
+    crawl(url, url, visited, contents, depth)
+    return contents

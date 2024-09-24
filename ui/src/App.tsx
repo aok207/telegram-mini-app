@@ -8,10 +8,10 @@ import useDownload from "./hooks/useDownload";
 
 const App = () => {
   // const { user } = useTelegram();
-  const [data, setData] = useState<Data | null>(null);
+  const [data, setData] = useState<Data[] | null>(null);
   const { download } = useDownload({
     data: [JSON.stringify(data, null, 2)],
-    fileName: data?.meta_data.title || "",
+    fileName: data ? data[0][Object.keys(data[0])[0]].meta_data.title : "",
   });
 
   return (
