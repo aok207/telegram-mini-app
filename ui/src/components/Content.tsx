@@ -9,7 +9,7 @@ import {
 
 const Content = ({ data }: { data: Data[] }) => {
   return (
-    <Accordion type="multiple" collapsible>
+    <Accordion type="multiple">
       {data.map((content, index) => {
         const url: string = Object.keys(content)[0];
         const data: {
