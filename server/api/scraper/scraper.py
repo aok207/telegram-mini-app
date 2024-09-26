@@ -3,14 +3,14 @@ from collections.abc import Iterable
 from typing import Any, Final, Union, cast
 from urllib.parse import unquote, urljoin, urlparse
 
-import log
+from api.log import setup_logger
 import requests
 from bs4 import BeautifulSoup, PageElement, Tag
 
-from .classify import classify_page
+from api.scraper.classify import classify_page
 
 # Set up the logger
-logger = log.setup_logger(__name__)
+logger = setup_logger(__name__)
 
 # List of unwanted texts, typically common site elements that are not relevant for scraping
 unwanted_texts: Final[list[str]] = [
