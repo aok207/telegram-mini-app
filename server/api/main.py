@@ -4,7 +4,7 @@ import validators
 from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from scraper.scraper import crawl_website
+from .scraper.scraper import crawl_website
 
 
 class Data(BaseModel):
