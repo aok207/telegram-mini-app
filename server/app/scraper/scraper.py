@@ -380,5 +380,15 @@ def crawl(
 def crawl_website(url: str, depth: int = 1):
     visited: set[str] = set()
     contents: list[dict[str, dict[str, Any]]] = []
-    crawl(url, url, visited, contents, depth)
+
+    if depth == 1:
+        soup = get_html(url)
+
+        if soup is None:
+            return None
+
+        contents.append({url: scrape(url, soup)})
+    else:
+        crawl(url, url, visited, contents, depth)
+
     return contents
