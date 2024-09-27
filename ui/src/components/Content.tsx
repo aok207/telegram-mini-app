@@ -1,12 +1,12 @@
 import type { Content, Data, MetaData } from "@/types";
 import ShowBasedOnTag from "./ShowBasedOnTag";
 import
-  {
-    Accordion,
-    AccordionContent,
-    AccordionItem,
-    AccordionTrigger,
-  } from "@/components/ui/accordion";
+{
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const Content = ( { data }: { data: Data[]; } ) =>
 {
@@ -23,7 +23,7 @@ const Content = ( { data }: { data: Data[]; } ) =>
 
         return (
           <AccordionItem key={ url } value={ `link-${ index + 1 }` }>
-            <AccordionTrigger className="text-wrap">{ url }</AccordionTrigger>
+            <AccordionTrigger className="text-wrap"><a href={ url } target="_blank">{ url }</a></AccordionTrigger>
             <AccordionContent>
               <div className="flex flex-col gap-4">
                 <h1 className="font-bold text-3xl">{ data.meta_data.title }</h1>
